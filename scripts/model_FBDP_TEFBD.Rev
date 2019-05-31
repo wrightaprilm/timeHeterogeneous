@@ -1,0 +1,50 @@
+##########################################################################################
+# Joint Fossilized Birth-Death Process prior on the topology and fossil occurrence times #
+##########################################################################################
+timeline <- v(5, 33, 99)
+alpha <- 10
+
+for(i in 1:(timeline.size()+1))
+{
+    mu[i] ~ dnExp(alpha)
+    lambda[i] ~ dnExp(alpha)
+    psi[i] ~ dnExp(alpha)
+
+    div[i] := lambda[i] - mu[i]
+    turnover[i] := mu[i]/lambda[i]
+
+    moves[mvi++] = mvScale(mu[i], lambda = 0.01)
+    moves[mvi++] = mvScale(mu[i], lambda = 0.1)
+    moves[mvi++] = mvScale(mu[i], lambda = 1)
+
+    moves[mvi++] = mvScale(lambda[i], lambda = 0.01)
+    moves[mvi++] = mvScale(lambda[i], lambda = 0.1)
+    moves[mvi++] = mvScale(lambda[i], lambda = 1)
+
+    moves[mvi++] = mvScale(psi[i], lambda = 0.01)
+    moves[mvi++] = mvScale(psi[i], lambda = 0.1)
+    moves[mvi++] = mvScale(psi[i], lambda = 1)
+}
+
+
+# Create deterministic nodes for the diversification and turnover rates so that they can be monitored #
+diversification := lambda - mu
+turnover := mu/lambda
+
+# Fix the probability of sampling parameter (rho) to 1, #
+# because all extant bears are represented in this analysis #
+rho <- .0461
+
+### Define the tree-prior distribution as the fossilized birth-death process ###
+intervals = readDataDelimitedFile(file="data/foss_int.tsv", header=true)
+
+bd ~ dnFBDRMatrix(taxa=taxa, lambda=lambda, mu=mu, psi=psi, rho=rho, timeline=timeline)
+
+# Specify mclade(taxon))
+moves[mvi++] = mvMatrixElementScale(bd, lambda = 0.01, weight=taxa.size())
+moves[mvi++] = mvMatrixElementScale(bd, lambda = 0.1, weight=taxa.size())
+moves[mvi++] = mvMatrixElementScale(bd, lambda = 1, weight=taxa.size())
+
+moves[mvi++] = mvMatrixElementSlide(bd, delta = 0.01, weight=taxa.size())
+moves[mvi++] = mvMatrixElementSlide(bd, delta = 0.1, weight=taxa.size())
+moves[mvi++] = mvMatrixElementSlide(bd, delta = 1, weight=taxa.size())
