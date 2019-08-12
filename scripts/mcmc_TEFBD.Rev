@@ -57,21 +57,20 @@ mni = 1
 # 1. for the full model #
 monitors[mni++] = mnModel(filename="output/ants.log", printgen=10)
 monitors[mni++] = mnStochasticVariable(filename="output/mcmc-stoch.log", printgen=10)
+monitors[mni++] = mnScreen(lambda[1], printgen=100)
 
 # 2. the tree #
-# monitors to print RevGagets input
-monitors[mni++] = mnFile(filename="output/model1_speciation_rates.log",lambda,printgen=10)
-monitors[mni++] = mnFile(filename="output/model1_speciation_times.log",timeline,printgen=10)
-monitors[mni++] = mnFile(filename="output/model1_extinction_rates.log",mu,printgen=10)
-monitors[mni++] = mnFile(filename="output/model1_extinction_times.log",timeline,printgen=10)
-monitors[mni++] = mnFile(filename="output/model1_sampling_rates.log",psi,printgen=10)
-monitors[mni++] = mnFile(filename="output/model1_sampling_times.log",timeline,printgen=10)
+# monitors to print RevGagets inpu2
+monitors[mni++] = mnFile(filename="output/model2_speciation_rates.log",lambda,printgen=10)
+monitors[mni++] = mnFile(filename="output/model2_speciation_times.log",timeline,printgen=10)
+monitors[mni++] = mnFile(filename="output/model2_extinction_rates.log",mu,printgen=10)
+monitors[mni++] = mnFile(filename="output/model2_extinction_times.log",timeline,printgen=10)
+monitors[mni++] = mnFile(filename="output/model2_sampling_rates.log",psi,printgen=10)
+monitors[mni++] = mnFile(filename="output/model2_sampling_times.log",timeline,printgen=10)
 # Initialize the MCMC object #
 mymcmc = mcmc(mymodel, monitors, moves)
-#trace = readStochasticVariableTrace(file="output/mcmc-stoch.log")
-#mymcmc.initializeFromTrace(trace)
 # Run the MCMC #
-mymcmc.run(generations=50000)
+mymcmc.run(generations=500000)
 
 # Quit RevBayes #
 q()
