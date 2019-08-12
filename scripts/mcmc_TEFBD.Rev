@@ -60,17 +60,9 @@ mni = 1
 
 # Create a vector of monitors #
 # 1. for the full model #
-monitors[mni++] = mnModel(filename="output/ants.log", printgen=10, lambda)
+monitors[mni++] = mnModel(filename="output/ants.log", printgen=10)
 monitors[mni++] = mnStochasticVariable(filename="output/mcmc-stoch.log", printgen=10)
-
-# 2. the tree #
-# monitors to print RevGagets input
-monitors[mni++] = mnFile(filename="output/model1_speciation_rates.log",lambda,printgen=10)
-monitors[mni++] = mnFile(filename="output/model1_speciation_times.log",timeline,printgen=10)
-monitors[mni++] = mnFile(filename="output/model1_extinction_rates.log",mu,printgen=10)
-monitors[mni++] = mnFile(filename="output/model1_extinction_times.log",timeline,printgen=10)
-monitors[mni++] = mnFile(filename="output/model1_sampling_rates.log",psi,printgen=10)
-monitors[mni++] = mnFile(filename="output/model1_sampling_times.log",timeline,printgen=10)
+monitors[mni++] = mnScreen(printgen=10, num_samp_anc, origin_time)
 # Initialize the MCMC object #
 mymcmc = mcmc(mymodel, monitors, moves)
 #trace = readStochasticVariableTrace(file="output/mcmc-stoch.log")
