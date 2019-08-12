@@ -32,6 +32,6 @@ rates_mol[i] := fnDiscretizeGamma( alpha_mol[i], alpha_mol[i], 4 )
 
 
 ### Create the substitution model and clamp with our observed DNA data ###
-phySeq[i] ~ dnPhyloCTMC(tree=bd, Q=Q_mol[i], siteRates=rates_mol[i], branchRates=branch_rates[i], type="DNA")
+phySeq[i] ~ dnPhyloCTMC(tree=fbd_tree, Q=Q_mol[i], siteRates=rates_mol[i], branchRates=branch_rates[i], type="DNA")
 phySeq[i].clamp(data[i])
 }

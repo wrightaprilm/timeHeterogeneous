@@ -57,4 +57,3 @@ for (i in 2:n_max_states) {
         idx = idx + 1
 idx
 }
-}

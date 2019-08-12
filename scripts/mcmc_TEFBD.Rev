@@ -42,6 +42,11 @@ n_taxa <- taxa.size()
 # Load the model files
 
 source("scripts/model_FBDP_TEFBD.Rev") # FBD tree prior
+source("scripts/model_UExp_TEFBD.Rev") # UExp relaxed clock
+
+source("scripts/model_GTRG_TEFBD.Rev") # Molecular substitution model (GTR+G)
+
+source("scripts/model_Morph_TEFBD.Rev") # Morphological character change model
 
 
 ########
@@ -57,16 +62,7 @@ mni = 1
 # 1. for the full model #
 monitors[mni++] = mnModel(filename="output/ants.log", printgen=10)
 monitors[mni++] = mnStochasticVariable(filename="output/mcmc-stoch.log", printgen=10)
-monitors[mni++] = mnScreen(lambda[1], printgen=100)
-
-# 2. the tree #
-# monitors to print RevGagets inpu2
-monitors[mni++] = mnFile(filename="output/model2_speciation_rates.log",lambda,printgen=10)
-monitors[mni++] = mnFile(filename="output/model2_speciation_times.log",timeline,printgen=10)
-monitors[mni++] = mnFile(filename="output/model2_extinction_rates.log",mu,printgen=10)
-monitors[mni++] = mnFile(filename="output/model2_extinction_times.log",timeline,printgen=10)
-monitors[mni++] = mnFile(filename="output/model2_sampling_rates.log",psi,printgen=10)
-monitors[mni++] = mnFile(filename="output/model2_sampling_times.log",timeline,printgen=10)
+monitors[mni++] = mnScreen(printgen=10, num_samp_anc, origin_time)
 # Initialize the MCMC object #
 mymcmc = mcmc(mymodel, monitors, moves)
 # Run the MCMC #
