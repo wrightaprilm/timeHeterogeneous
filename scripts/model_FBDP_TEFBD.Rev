@@ -1,31 +1,22 @@
 ##########################################################################################
 # Joint Fossilized Birth-Death Process prior on the topology and fossil occurrence times #
 ##########################################################################################
-timeline <- v(100, 66, 33)
+timeline <- v(5, 66, 175)
 
 alpha <- 10
 origin_time ~ dnUnif(100.0, 175)
-r <- .0461
+rho <- .0461
 
-intervals = readDataDelimitedFile(file="data/foss_int.tsv", header=true)
-
-
-origin_time ~ dnUnif(100.0, 200.0)
-
-# Specify a sliding-window move on the origin_time parameter #
-# This move will be applied with 3 different window widths (delta) to help improve mixing #
-moves[mvi++] = mvSlide(origin_time, delta=0.01, weight=5.0)
-moves[mvi++] = mvSlide(origin_time, delta=0.1,  weight=5.0)
-moves[mvi++] = mvSlide(origin_time, delta=1,    weight=5.0)
-
-for(i in 1:(timeline.size()+1))
+for(i in 1:(timeline.size() + 1))
 {
+    i
     mu[i] ~ dnExp(alpha)
     lambda[i] ~ dnExp(alpha)
     psi[i] ~ dnExp(alpha)
 
     # Specify a sliding-window move on the origin_time parameter #
     # This move will be applied with 3 different window widths (delta) to help improve mixing #
+
     moves[mvi++] = mvSlide(origin_time, delta=0.01, weight=5.0)
     moves[mvi++] = mvSlide(origin_time, delta=0.1,  weight=5.0)
     moves[mvi++] = mvSlide(origin_time, delta=1,    weight=5.0)
@@ -42,22 +33,15 @@ for(i in 1:(timeline.size()+1))
     moves[mvi++] = mvScale(psi[i], lambda = 0.01)
     moves[mvi++] = mvScale(psi[i], lambda = 0.1)
     moves[mvi++] = mvScale(psi[i], lambda = 1)
-    rho[i] <- .0461
 
-
-    ### Define the tree-prior distribution as the fossilized birth-death process ###
-#    fbd_dist[i] = dnFBDP(origin=origin_time, lambda=lambda[i], mu=mu[i], psi=psi[i], rho=rho, taxa=taxa,  )
-
-    # Create deterministic nodes for the diversification and turnover rates so that they can be monitored #
-    diversification[i] := lambda[i] - mu[i]
-    turnover[i] := mu[i]/lambda[i]
-    i += 1
 
     diversification[i] := lambda[i] - mu[i]
-    turnover[i] := mu[i]/lambda[i]
+    turnover[i] := mu[i] / lambda[i]
 }
-    fbd_dist = dnSerialSampledBirthDeath(origin=origin_time, timeline=timeline, lambda=lambda, mu=mu, psi=psi, rho=rho, rhoTimes = timeline,psiTimes=timeline, lambdaTimes=timeline, muTimes=timeline, taxa=taxa)
 
+#fbd_dist ~ dnFBDP(originAge=origin_time, timeline=timeline, lambda=lambda, mu=mu, psi=psi, rho=rho, taxa=taxa)
+fbd_dist = dnSerialSampledBirthDeath(lambda = lambda, lambdaTimes = v(5,33,66), mu = mu, muTimes= v(5,33,66), rho = rho, psi=psi, psiTimes=v(5,33,66), condition = "survival", taxa=taxa, rootAge=origin_time)
+fbd_dist
     Amblyoponinae =clade( "Adetomyrma_MAD02", "Adetomyrma_sp2b", "Amblyopone_australis", "Apomyrma_stygia", "Myopopone_castanea", "Mystrium_mysticum", "Mystrium_rogeri", "Onychomyrmex_hedleyi", "Prionopelta_MAD01", "Prionopelta_sp2" )
     Dolichoderinae =clade( "Anonychomyrma_gilberti", "Anonychomyrma_itinerans", "Anonychomyrma_nitidiceps", "Aptinoma_antongil", "Aptinoma_mangabe", "Arnoldius_AU01", "Axinidris_mlalu", "Axinidris_murielae", "Azteca_instabilis", "Azteca_ovaticeps", "Azteca_schimperi", "Azteca_sp", "Bothriomyrmex_meridionalis", "Bothriomyrmex_paradoxus", "Bothriomyrmex_saundersi", "Bothroponera_variolosa", "Bothroponera_wasmannii", "Chronoxenus_wroughtonii_javanus", "Doleromyrma_darwiniana", "Dolichoderus_debilis", "Dolichoderus_decollatus", "Dolichoderus_erectilobus", "Dolichoderus_imitator", "Dolichoderus_lamellosus", "Dolichoderus_pustulatus", "Dolichoderus_scabridus", "Dorymyrmex_bicolor", "Dorymyrmex_elegans", "Dorymyrmex_planidens", "Forelius_chalybaeus", "Forelius_pruinosus", "Forelius_sp", "Froggattella_kirbii", "Froggattella_latispina", "Gracilidris_pombero", "Iridomyrmex_AU01", "Iridomyrmex_pallidus", "Iridomyrmex_sanguineus", "Iridomyrmex_spadius", "Leptomyrmex_AU01", "Leptomyrmex_AUS01", "Leptomyrmex_erythrocephalus", "Leptomyrmex_sp", "Linepithema_humile", "Linepithema_keiteli", "Liometopum_apiculatum", "Liometopum_luctuosum", "Liometopum_occidentale", "Loweriella_boltoni", "Nebothriomyrmex_majeri", "Ochetellus_cf_glaber_clarithorax", "Ravavy_miafina" )
     Dorylinae =clade( "Acanthostichus_davisi", "Acanthostichus_kirbyi", "Acanthostichus_punctiscapus", "Aenictogiton_UG01", "Aenictogiton_ZAM02", "Aenictogiton_ZM02", "Aenictus_ceylonicus", "Aenictus_eugenii", "Aenictus_GA03", "Aenictus_sp1", "Aenictus_sp2", "Aenictus_turneri", "Amyrmex_BR01", "Cerapachys_augustae", "Cerapachys_biroi", "Cerapachys_CM02", "Cerapachys_desposyne", "Cerapachys_dohertyi", "Cerapachys_edentatus", "Cerapachys_foreli", "Cerapachys_fragosus", "Cerapachys_jacobsoni", "Cerapachys_KH01", "Cerapachys_KH02", "Cerapachys_L_MG04", "Cerapachys_L_MG08", "Cerapachys_L_MG11", "Cerapachys_larvatus", "Cerapachys_LK01", "Cerapachys_LK02", "Cerapachys_MG03", "Cerapachys_MG14", "Cerapachys_MG39", "Cerapachys_MG42", "Cerapachys_MG43", "Cerapachys_nkomoensis", "Cerapachys_P_MG09", "Cerapachys_paradoxus", "Cerapachys_PG01", "Cerapachys_sauteri", "Cerapachys_sexspinus", "Cerapachys_splendens", "Cerapachys_suscitatus", "Cerapachys_sylvicola", "Cerapachys_TH01", "Cerapachys_TH02", "Cerapachys_TH03", "Cerapachys_typhlus", "Cheliomyrmex_morosus_cf", "Cylindromyrmex_meinerti", "Cylindromyrmex_striatus", "Dorylus_emeryi_opacus", "Dorylus_GA01", "Dorylus_helvolus", "Dorylus_laevigatus", "Dorylus_mayri", "Dorylus_wilverthi", "Eciton_hamatum", "Eciton_vagans", "Labidus_praedator", "Labidus_spininodis", "Leptanilloides_femoralis", "Leptanilloides_gracilis", "Leptanilloides_mckennae", "Leptanilloides_nomada", "Leptanilloides_nubecula", "Neivamyrmex_CR01", "Neivamyrmex_nigrescens", "Nomamyrmex_esenbeckii" )
@@ -68,19 +52,20 @@ for(i in 1:(timeline.size()+1))
     Ponerinae =clade( "Anochetus_emarginatus", "Anochetus_madagascarensis", "Anochetus_mayri", "Austroponera_castanea", "Brachyponera_atrata", "Brachyponera_chinensis", "Brachyponera_sennaarensis", "Buniapone_amblyops", "Centromyrmex_brachycola", "Centromyrmex_feae", "Centromyrmex_hamulatus", "Centromyrmex_sellaris", "Cryptopone_gilva", "Cryptopone_sauteri", "Diacamma_rugosum", "Diacamma_sp", "Diacamma_sp_Indo1", "Dinoponera_australis", "Dinoponera_gigantea", "Emeryopone_buttelreepeni", "Euponera_sikorae", "Hagensia_havilandi", "Harpegnathos_saltator", "Harpegnathos_venator", "Hypoponera_inexorata", "Hypoponera_opacior", "Hypoponera_sakalava", "Hypoponera_sp_Mal1", "Hypoponera_sp_Mal2", "Hypoponera_sp_Mal3", "Leptogenys_attenuata", "Leptogenys_crassicornis", "Leptogenys_diminuta", "Leptogenys_falcigera", "Leptogenys_iridescens", "Leptogenys_occidentalis", "Leptogenys_sp", "Leptogenys_sp_Ecu1", "Loboponera_politula", "Mayaponera_constricta", "Megaponera_analis", "Mesoponera_ingesta", "Mesoponera_rubra", "Myopias_lobosa", "Myopias_sp_Mal1", "Myopias_tenuis", "Neoponera_aenescens", "Neoponera_apicalis", "Neoponera_carinulata", "Neoponera_commutata", "Neoponera_fauveli", "Neoponera_marginata", "Neoponera_unidentata", "Neoponera_villosa", "Odontomachus_cephalotes", "Odontomachus_clarus", "Odontomachus_coquereli",  "Odontoponera_transversa", "Ophthalmopone_berthoudi", "Pachycondyla_crassinoda", "Pachycondyla_harpax", "Pachycondyla_impressa", "Pachycondyla_sp_CAR1", "Pachycondyla_sp_JTL011", "Pachycondyla_sp_Mal1", "Pachycondyla_sp_Mal2", "Pachycondyla_sp_Mal3", "Paltothyreus_tarsatus", "Phrynoponera_gabonensis", "Platythyrea_lamellosa", "Platythyrea_mocquerysi", "Platythyrea_punctata", "Platythyrea_quadridenta", "Platythyrea_strenua", "Platythyrea_turneri", "Plectroctena_minor", "Plectroctena_ugandensis", "Ponera_pennsylvanica", "Ponera_sp_Mal1", "Psalidomyrmex_procerus", "Pseudoneoponera_rufipes", "Pseudoponera_stigma" )
     Proceratiinae =clade( "Discothyrea_MAD07", "Discothyrea_sp", "Probolomyrmex_sp", "Probolomyrmex_tani", "Proceratium_MAD08", "Proceratium_sp1", "Proceratium_stictum" )
     Pseudomyrmecinae =clade( "Myrcidris_epicharis", "Pseudomyrmex_apache", "Pseudomyrmex_gracilis" )
+
     constraints = v(Amblyoponinae,Dolichoderinae,Dorylinae,Ectatomminae,Formicinae,Myrmeciinae,Myrmicinae,Ponerinae,Proceratiinae,Pseudomyrmecinae)
 
     fbd_tree ~ dnConstrainedTopology(fbd_dist, constraints=constraints)
 
     # Specify mclade(taxon))
-    #intervals = readDataDelimitedFile(file="ants_fossil_intervals.tsv", header=true)
+    intervals = readDataDelimitedFile(file="data/foss_int.tsv", header=true)
 
     for(i in 1:intervals.size())
     {
      taxon  = intervals[i][1]
      a_i = intervals[i][2]
      b_i = intervals[i][3]
-
+     a_i
      t[i] := tmrca(fbd_tree, clade(taxon))
 
      fossil[i] ~ dnUniform(t[i] - b_i, t[i] - a_i)
