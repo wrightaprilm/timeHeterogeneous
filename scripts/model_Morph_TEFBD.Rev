@@ -4,30 +4,6 @@
 states = v(2,3,4,5,6,7)
 n_max_states <- states.size()
 
-# branch length
-# branch lengths
-nbr <- 2*taxa.size() - 3
-
-for (b in 1:nbr){
-    br_lens[b] ~ dnExponential(5.0)
-    moves[mvi++] = mvScale(br_lens[b])
-}
-# We also use a discretized gamma distribution of rate categories #
-# again, the shape parameter is drawn from an exponential prior #
-alpha_morpho ~ dnExponential( 1.0 )
-rates_morpho := fnDiscretizeGamma( alpha_morpho, alpha_morpho, 4 )
-
-moves[mvi++] = mvScale(alpha_morpho, lambda=0.01, weight=1.0)
-moves[mvi++] = mvScale(alpha_morpho, lambda=0.1,  weight=1.0)
-moves[mvi++] = mvScale(alpha_morpho, lambda=1,    weight=1.0)
-
-clock_morpho ~ dnExponential(1.0)
-
-moves[mvi++] = mvScale(clock_morpho, lambda=0.01, weight=4.0)
-moves[mvi++] = mvScale(clock_morpho, lambda=0.1,  weight=4.0)
-moves[mvi++] = mvScale(clock_morpho, lambda=1,    weight=4.0)
-
-
 idx = 1
 morpho_bystate[1] <- morpho
 for (i in 2:n_max_states) {
@@ -42,16 +18,33 @@ for (i in 2:n_max_states) {
         # make i-by-i rate matrix
         q[idx] <- fnJC(i)
        q[idx]
+       # We also use a discretized gamma distribution of rate categories #
+       # again, the shape parameter is drawn from an exponential prior #
+       alpha_morpho[i] ~ dnExponential( 1.0 )
+       rates_morpho[i] := fnDiscretizeGamma( alpha_morpho[i], alpha_morpho[i], 4 )
+
+       moves[mvi++] = mvScale(alpha_morpho[i], lambda=0.01, weight=1.0)
+       moves[mvi++] = mvScale(alpha_morpho[i], lambda=0.1,  weight=1.0)
+       moves[mvi++] = mvScale(alpha_morpho[i], lambda=1,    weight=1.0)
+
+       clock_morpho[i] ~ dnExponential(1.0)
+
+       moves[mvi++] = mvScale(clock_morpho[i], lambda=0.01, weight=4.0)
+       moves[mvi++] = mvScale(clock_morpho[i], lambda=0.1,  weight=4.0)
+       moves[mvi++] = mvScale(clock_morpho[i], lambda=1,    weight=4.0)
+
+
+
 # create model of evolution for the character block
         m_morph[idx] ~ dnPhyloCTMC( tree=fbd_tree,
                                     Q=q[idx],
                                     nSites=nc,
-                                    branchRates = clock_morpho,
-                                    siteRates=rates_morpho,
+                                    branchRates = clock_morpho[i],
+                                    siteRates=rates_morpho[i],
                                     type="Standard")
 
         # attach the data
-	m_morph[idx].clamp(morpho_bystate[i])
+	       m_morph[idx].clamp(morpho_bystate[i])
 
         # increment counter
         idx = idx + 1

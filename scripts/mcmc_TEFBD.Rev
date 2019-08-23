@@ -11,7 +11,6 @@
 #######################
 # Reading in the data #
 #######################
-seed(1234)
 # Create the full list of taxa (including all fossils and extant species #
 taxa <- readTaxonData("data/final_tip_ages.tsv")
 
@@ -54,13 +53,14 @@ source("scripts/model_Morph_TEFBD.Rev") # Morphological character change model
 ########
 
 # initialize the model object #
-mymodel = model(alpha)
+mymodel = model(origin_time)
 
 mni = 1
 
 # Create a vector of monitors #
 # 1. for the full model #
 monitors[mni++] = mnModel(filename="output/ants.log", printgen=10)
+monitors[mni++] = mnFile(filename="output/ants.trees", printgen=10, fbd_tree)
 monitors[mni++] = mnStochasticVariable(filename="output/mcmc-stoch.log", printgen=10)
 monitors[mni++] = mnScreen(printgen=10, num_samp_anc, origin_time)
 # Initialize the MCMC object #
