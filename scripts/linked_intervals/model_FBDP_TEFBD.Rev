@@ -5,43 +5,56 @@ timeline <- v(5, 66, 100)
 
 alpha <- 10
 rho <- .0461
+mu ~ dnExp(alpha)
+lambda ~ dnExp(alpha)
 
-for(i in 1:(timeline.size() + 1))
-{
-    i
-    mu[i] ~ dnExp(alpha)
-    lambda[i] ~ dnExp(alpha)
-    psi[i] ~ dnExp(alpha)
-    origin_time ~ dnUnif(100, 200)
+origin_time ~ dnUnif(100, 200)
 
 
-    # Specify a sliding-window move on the origin_time parameter #
-    # This move will be applied with 3 different window widths (delta) to help improve mixing #
+# Specify a sliding-window move on the origin_time parameter #
+# This move will be applied with 3 different window widths (delta) to help improve mixing #
 
-    moves[mvi++] = mvSlide(origin_time, delta=0.01, weight=5.0)
-    moves[mvi++] = mvSlide(origin_time, delta=0.1,  weight=5.0)
-    moves[mvi++] = mvSlide(origin_time, delta=1,    weight=5.0)
-
-
-    moves[mvi++] = mvScale(mu[i], lambda = 0.01)
-    moves[mvi++] = mvScale(mu[i], lambda = 0.1)
-    moves[mvi++] = mvScale(mu[i], lambda = 1)
-
-    moves[mvi++] = mvScale(lambda[i], lambda = 0.01)
-    moves[mvi++] = mvScale(lambda[i], lambda = 0.1)
-    moves[mvi++] = mvScale(lambda[i], lambda = 1)
-
-    moves[mvi++] = mvScale(psi[i], lambda = 0.01)
-    moves[mvi++] = mvScale(psi[i], lambda = 0.1)
-    moves[mvi++] = mvScale(psi[i], lambda = 1)
+moves[mvi++] = mvSlide(origin_time, delta=0.01, weight=5.0)
+moves[mvi++] = mvSlide(origin_time, delta=0.1,  weight=5.0)
+moves[mvi++] = mvSlide(origin_time, delta=1,    weight=5.0)
 
 
-    diversification[i] := lambda[i] - mu[i]
-    turnover[i] := mu[i] / lambda[i]
-}
+moves[mvi++] = mvScale(mu, lambda = 0.01)
+moves[mvi++] = mvScale(mu, lambda = 0.1)
+moves[mvi++] = mvScale(mu, lambda = 1)
+
+moves[mvi++] = mvScale(lambda, lambda = 0.01)
+moves[mvi++] = mvScale(lambda, lambda = 0.1)
+moves[mvi++] = mvScale(lambda, lambda = 1)
+
+
+diversification := lambda - mu
+turnover := mu / lambda
+
+psi[1] ~ dnExp(alpha)
+psi[2] ~ dnExp(psi[1])
+psi[3] ~ dnExp(psi[2])
+psi[4] ~ dnExp(psi[3])
+
+
+moves[mvi++] = mvScale(psi[1], lambda = 0.01)
+moves[mvi++] = mvScale(psi[1], lambda = 0.1)
+moves[mvi++] = mvScale(psi[1], lambda = 1)
+
+moves[mvi++] = mvScale(psi[2], lambda = 0.01)
+moves[mvi++] = mvScale(psi[2], lambda = 0.1)
+moves[mvi++] = mvScale(psi[2], lambda = 1)
+
+
+moves[mvi++] = mvScale(psi[3], lambda = 0.01)
+moves[mvi++] = mvScale(psi[3], lambda = 0.1)
+moves[mvi++] = mvScale(psi[3], lambda = 1)
+
+moves[mvi++] = mvScale(psi[4], lambda = 0.01)
+moves[mvi++] = mvScale(psi[4], lambda = 0.1)
+moves[mvi++] = mvScale(psi[4], lambda = 1)
 
 fbd_dist = dnSSBDP(originAge=origin_time,lambda=lambda, timeline=timeline, mu=mu, phi=psi, r=rho, taxa=taxa)
-#fbd_dist = dnSerialSampledBirthDeath(lambda = lambda, lambdaTimes = timeline, mu = mu, muTimes= timeline, rho = rho, psi=psi, psiTimes=timeline, condition = "survival", taxa=taxa, rootAge=origin_time)
     Amblyoponinae =clade( "Adetomyrma_MAD02", "Adetomyrma_sp2b", "Amblyopone_australis", "Apomyrma_stygia", "Myopopone_castanea", "Mystrium_mysticum", "Mystrium_rogeri", "Onychomyrmex_hedleyi", "Prionopelta_MAD01", "Prionopelta_sp2" )
     Dolichoderinae =clade( "Anonychomyrma_gilberti", "Anonychomyrma_itinerans", "Anonychomyrma_nitidiceps", "Aptinoma_antongil", "Aptinoma_mangabe", "Arnoldius_AU01", "Axinidris_mlalu", "Axinidris_murielae", "Azteca_instabilis", "Azteca_ovaticeps", "Azteca_schimperi", "Azteca_sp", "Bothriomyrmex_meridionalis", "Bothriomyrmex_paradoxus", "Bothriomyrmex_saundersi", "Bothroponera_variolosa", "Bothroponera_wasmannii", "Chronoxenus_wroughtonii_javanus", "Doleromyrma_darwiniana", "Dolichoderus_debilis", "Dolichoderus_decollatus", "Dolichoderus_erectilobus", "Dolichoderus_imitator", "Dolichoderus_lamellosus", "Dolichoderus_pustulatus", "Dolichoderus_scabridus", "Dorymyrmex_bicolor", "Dorymyrmex_elegans", "Dorymyrmex_planidens", "Forelius_chalybaeus", "Forelius_pruinosus", "Forelius_sp", "Froggattella_kirbii", "Froggattella_latispina", "Gracilidris_pombero", "Iridomyrmex_AU01", "Iridomyrmex_pallidus", "Iridomyrmex_sanguineus", "Iridomyrmex_spadius", "Leptomyrmex_AU01", "Leptomyrmex_AUS01", "Leptomyrmex_erythrocephalus", "Leptomyrmex_sp", "Linepithema_humile", "Linepithema_keiteli", "Liometopum_apiculatum", "Liometopum_luctuosum", "Liometopum_occidentale", "Loweriella_boltoni", "Nebothriomyrmex_majeri", "Ochetellus_cf_glaber_clarithorax", "Ravavy_miafina" )
     Dorylinae =clade( "Acanthostichus_davisi", "Acanthostichus_kirbyi", "Acanthostichus_punctiscapus", "Aenictogiton_UG01", "Aenictogiton_ZAM02", "Aenictogiton_ZM02", "Aenictus_ceylonicus", "Aenictus_eugenii", "Aenictus_GA03", "Aenictus_sp1", "Aenictus_sp2", "Aenictus_turneri", "Amyrmex_BR01", "Cerapachys_augustae", "Cerapachys_biroi", "Cerapachys_CM02", "Cerapachys_desposyne", "Cerapachys_dohertyi", "Cerapachys_edentatus", "Cerapachys_foreli", "Cerapachys_fragosus", "Cerapachys_jacobsoni", "Cerapachys_KH01", "Cerapachys_KH02", "Cerapachys_L_MG04", "Cerapachys_L_MG08", "Cerapachys_L_MG11", "Cerapachys_larvatus", "Cerapachys_LK01", "Cerapachys_LK02", "Cerapachys_MG03", "Cerapachys_MG14", "Cerapachys_MG39", "Cerapachys_MG42", "Cerapachys_MG43", "Cerapachys_nkomoensis", "Cerapachys_P_MG09", "Cerapachys_paradoxus", "Cerapachys_PG01", "Cerapachys_sauteri", "Cerapachys_sexspinus", "Cerapachys_splendens", "Cerapachys_suscitatus", "Cerapachys_sylvicola", "Cerapachys_TH01", "Cerapachys_TH02", "Cerapachys_TH03", "Cerapachys_typhlus", "Cheliomyrmex_morosus_cf", "Cylindromyrmex_meinerti", "Cylindromyrmex_striatus", "Dorylus_emeryi_opacus", "Dorylus_GA01", "Dorylus_helvolus", "Dorylus_laevigatus", "Dorylus_mayri", "Dorylus_wilverthi", "Eciton_hamatum", "Eciton_vagans", "Labidus_praedator", "Labidus_spininodis", "Leptanilloides_femoralis", "Leptanilloides_gracilis", "Leptanilloides_mckennae", "Leptanilloides_nomada", "Leptanilloides_nubecula", "Neivamyrmex_CR01", "Neivamyrmex_nigrescens", "Nomamyrmex_esenbeckii" )
@@ -54,7 +67,6 @@ fbd_dist = dnSSBDP(originAge=origin_time,lambda=lambda, timeline=timeline, mu=mu
     Pseudomyrmecinae =clade( "Myrcidris_epicharis", "Pseudomyrmex_apache", "Pseudomyrmex_gracilis" )
     constraints = v(Amblyoponinae ,Dolichoderinae,Dorylinae,Ectatomminae,Formicinae,Myrmicinae,Ponerinae,Proceratiinae,Pseudomyrmecinae)
     fbd_tree ~ dnConstrainedTopology(fbd_dist, constraints=constraints)
-#    fbd_tree ~ simBirthDeath(timeline = timeline, lambda = lambda, mu=mu, r=rho, phi=psi,  constraints=constraints)
 
     # Specify mclade(taxon))
     intervals = readDataDelimitedFile(file="data/foss_int.tsv", header=true)
