@@ -40,12 +40,12 @@ n_taxa <- taxa.size()
 
 # Load the model files
 
-source("scripts/model_FBDP_TEFBD.Rev") # FBD tree prior
-source("scripts/model_UExp_TEFBD.Rev") # UExp relaxed clock
+source("scripts/caleb_intervals/model_FBDP_TEFBD.Rev") # FBD tree prior
+source("scripts/caleb_intervals/model_UExp_TEFBD.Rev") # UExp relaxed clock
 
-source("scripts/model_GTRG_TEFBD.Rev") # Molecular substitution model (GTR+G)
+source("scripts/caleb_intervals/model_GTRG_TEFBD.Rev") # Molecular substitution model (GTR+G)
 
-source("scripts/model_Morph_TEFBD.Rev") # Morphological character change model
+source("scripts/caleb_intervals/model_Morph_TEFBD.Rev") # Morphological character change model
 
 
 ########
@@ -59,15 +59,16 @@ mni = 1
 
 # Create a vector of monitors #
 # 1. for the full model #
-monitors[mni++] = mnModel(filename="output/younger_int.log", printgen=10)
-monitors[mni++] = mnFile(filename="output/younger_int.trees", printgen=10, fbd_tree)
-monitors[mni++] = mnStochasticVariable(filename="output/younger_int-stoch.log", printgen=10)
+monitors[mni++] = mnModel(filename="output/caleb_foss.log", printgen=10)
+monitors[mni++] = mnFile(filename="output/caleb_foss.trees", printgen=10, fbd_tree)
+monitors[mni++] = mnStochasticVariable(filename="output/caleb_foss.stoch.log", printgen=10)
 monitors[mni++] = mnScreen(printgen=10, num_samp_anc, origin_time)
 # Initialize the MCMC object #
 mymcmc = mcmc(mymodel, monitors, moves)
-# Run the MCMC #
-trace = readStochasticVariableTrace(file="younger_int-stoch.log")
+trace = readStochasticVariableTrace(file="output/caleb_foss.stoch.log")
 mymcmc.initializeFromTrace(trace)
-mymcmc.run(generations=200000)
+# Run the MCMC #
+mymcmc.run(generations=500000)
+
 # Quit RevBayes #
 q()
